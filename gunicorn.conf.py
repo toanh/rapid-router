@@ -60,7 +60,11 @@ accesslog = "-"
 access_log_format = 'gunicorn method=%(m)s path="%(U)s" status=%(s)s duration=%(M)sms request_id=%({x-request-id}i)s fwd="%({x-forwarded-for}i)s" user_agent="%(a)s"'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 pythonpath = 'example_project'
 =======
 pythonpath = 'example_project, .'
 >>>>>>> 5e7e14b4 (adding gunicorn)
+=======
+pythonpath = 'example_project'
+>>>>>>> 5cec3ccb (adding gunicorn.confwq)
