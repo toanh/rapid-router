@@ -71,7 +71,7 @@ python-dateutil==2.9.0.post0
 pytz==2024.2
 PyYAML==6.0.2
 qrcode==7.4.2
--e git+https://github.com/toanh/rapid-router.git
+-e git+https://github.com/toanh/rapid-router.git#egg=rapid_router
 reportlab==4.2.5
 requests==2.32.2
 selenium==4.9.0
