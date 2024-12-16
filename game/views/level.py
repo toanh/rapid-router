@@ -37,6 +37,7 @@ def play_custom_level_from_editor(request, levelId):
 
 def play_custom_level(request, levelId, from_editor=False):
     level = cached_custom_level(levelId)
+    print("Playing custom level:" + str(levelId))
     if level.default:
         raise Http404
 
@@ -178,12 +179,15 @@ def play_level(request, level, from_editor=False, from_python_den=False):
         else "night" in request.GET
     )
 
+    # removing permissions check
+    '''
     if not permissions.can_play_level(
         request.user, level, app_settings.EARLY_ACCESS_FUNCTION(request)
     ):
         return renderError(
             request, messages.no_permission_title(), messages.not_shared_level()
         )
+    '''
 
     subtitle = level.subtitle
     lesson = (
