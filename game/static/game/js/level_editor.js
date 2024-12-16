@@ -2827,7 +2827,7 @@ ocargo.LevelEditor = function (levelId) {
 
     function isLoggedIn(activity) {
         // TEST: removing authentication
-        if (true || USER_STATUS !== "SCHOOL_STUDENT" && USER_STATUS !== "TEACHER" && USER_STATUS !== "INDEPENDENT_STUDENT") {
+        if (true) { //} USER_STATUS !== "SCHOOL_STUDENT" && USER_STATUS !== "TEACHER" && USER_STATUS !== "INDEPENDENT_STUDENT") {
             var getNotLoggedInMessage = function () {
                 var notLoggedInMessages = [];
                 switch (activity) {
