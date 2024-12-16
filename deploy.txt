@@ -1,0 +1,109 @@
+// adapted from: https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu
+sudo apt update
+sudo apt install python3-venv python3-dev nginx curl
+git clone https://github.com/toanh/rapid-router.git
+sudo apt install python3-pip
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt --no-deps	// requirements.txt needs to update reportlab==4.2.5 , --no-deps prevents conflicting dependency from portal project , pip freeze already captures all subdependencies in this requirements.txt
+./example_project/manage.py collectstatic --noinput --clear
+./example_project/manage.py migrate --no-input
+
+// for testing!
+sudo ufw allow 8000
+./example_project/manage.py runserver 0.0.0.0:8000
+
+sudo nano /etc/systemd/system/gunicorn.socket
+
+@/etc/systemd/system/gunicorn.socket
+'''
+[Unit]
+Description=gunicorn socket
+
+[Socket]
+ListenStream=/run/gunicorn.sock
+
+[Install]
+WantedBy=sockets.target
+'''
+
+sudo nano /etc/systemd/system/gunicorn.service
+@/etc/systemd/system/gunicorn.service
+'''
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/root/rapid-router/example_project
+ExecStart=/root/rapid-router/venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          example_project.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+'''
+
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
+
+//Testing
+sudo systemctl status gunicorn.socket
+file /run/gunicorn.sock
+// if there's a problem, check logs:
+sudo journalctl -u gunicorn.socket
+
+// testing socket activation
+sudo systemctl status gunicorn
+curl --unix-socket /run/gunicorn.sock localhost
+
+// if errors, check logs:
+sudo journalctl -u gunicorn
+
+// if changing .service file, do the following to refresh
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+
+/////////// NGINX ///////////
+sudo nano /etc/nginx/sites-available/rapid-router
+@/etc/nginx/sites-available/rapid-router:
+'''
+server {
+    listen 80;
+    server_name 209.38.25.26;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /root/rapid-router;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+}
+'''
+sudo ln -s /etc/nginx/sites-available/rapid-router /etc/nginx/sites-enabled
+// test syntax
+sudo nginx -t
+sudo systemctl restart nginx
+
+// firewall rules
+sudo ufw delete allow 8000
+sudo ufw allow 'Nginx Full'
+
+// permissions
+sudo gpasswd -a www-data root
+sudo chown -R www-data:www-data /root/rapid-router/
+sudo chmod 755 /root
+sudo chmod 755 /root/rapid-router/
+
+
+
+
+
