@@ -57,10 +57,11 @@ def level_editor(request, levelId=None):
     }
     if levelId:
         level = Level.objects.get(id=levelId)
-        user_profile = UserProfile.objects.get(id=level.owner_id)
+        # TEST: removing permissions
+        #user_profile = UserProfile.objects.get(id=level.owner_id)
 
-        if request.user.id == user_profile.user_id:
-            context["level"] = levelId
+        #if request.user.id == user_profile.user_id:
+        #    context["level"] = levelId
 
     return render(request, "game/level_editor.html", context=context)
 
@@ -212,6 +213,8 @@ def save_level_for_editor(request, levelId=None):
     data = json.loads(request.POST["data"])
     data["disable_algorithm_score"] = True
 
+    print("Test: removing all permission checks")
+
     if ("character" not in data) or (not data["character"]):
         # Set a default, to deal with issue #1158 "Cannot save custom level"
         data["character"] = 1
@@ -219,10 +222,13 @@ def save_level_for_editor(request, levelId=None):
         level = get_object_or_404(Level, id=levelId)
     else:
         level = Level(default=False, anonymous=data["anonymous"])
-        if permissions.can_create_level(request.user):
+        '''if permissions.can_create_level(request.user):        
             level.owner = request.user.userprofile
-    if not permissions.can_save_level(request.user, level):
-        return HttpResponseUnauthorized()
+        '''
+        #level.owner = request.user.userprofile
+    
+    #if not permissions.can_save_level(request.user, level):
+    #    return HttpResponseUnauthorized()
 
     pattern = re.compile("^(\w?[ ]?)*$")
 
@@ -232,6 +238,8 @@ def save_level_for_editor(request, levelId=None):
         if levelId is None:
             teacher = None
 
+            # getting rid of all sharing permissions
+            '''
             is_user_school_student = (
                 hasattr(level.owner, "student")
                 and not level.owner.student.is_independent()
@@ -270,6 +278,7 @@ def save_level_for_editor(request, levelId=None):
                     for school_admin in school_admins
                     if school_admin.new_user != request.user
                 ]
+            '''
 
             level.save()
         response = {"id": level.id}

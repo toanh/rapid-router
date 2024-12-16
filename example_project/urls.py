@@ -7,6 +7,8 @@ from game import python_den_urls
 
 admin.autodiscover()
 
+print(game_urls)
+
 urlpatterns = [
     re_path(r"^", include(portal_urls)),
     path("administration/", admin.site.urls),

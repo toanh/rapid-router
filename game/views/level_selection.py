@@ -262,6 +262,7 @@ def levels(request, language):
 
 
 def blockly_levels(request):
+    print("Blockly_levels:" + str(request))
     return render(
         request, "game/level_selection.html", context=levels(request, "blockly")
     )
