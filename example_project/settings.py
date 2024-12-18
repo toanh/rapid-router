@@ -36,6 +36,8 @@ DATABASES = {
     }
 }
 
+print(DATABASES["default"]["NAME"])
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 USE_I18N = True
