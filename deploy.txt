@@ -6,6 +6,7 @@ sudo apt install python3-pip
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt --no-deps	// requirements.txt needs to update reportlab==4.2.5 , --no-deps prevents conflicting dependency from portal project , pip freeze already captures all subdependencies in this requirements.txt
+// if the -e in the requirements.txt gets updated (external GitHub editable dependency to repo), do an rm -rf on the venv/src folder first
 ./example_project/manage.py collectstatic --noinput --clear
 ./example_project/manage.py migrate --no-input
 
